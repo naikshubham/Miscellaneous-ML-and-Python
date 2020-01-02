@@ -24,5 +24,5 @@ df = pd.DataFrame({'A': a, 'B': b}, index=[0])
 0  2  3
 ```
 
-Notebook : [notebooks/]dict_to_dataframe
-Reference : https://stackoverflow.com/questions/17839973/constructing-pandas-dataframe-from-values-in-variables-gives-valueerror-if-usi
+- Notebook : [notebooks/dict_to_dataframe]
+- Reference : https://stackoverflow.com/questions/17839973/constructing-pandas-dataframe-from-values-in-variables-gives-valueerror-if-usi
