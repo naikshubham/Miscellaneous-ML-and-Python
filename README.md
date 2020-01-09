@@ -26,3 +26,24 @@ df = pd.DataFrame({'A': a, 'B': b}, index=[0])
 
 - Notebook : [notebooks/dict_to_dataframe]
 - Reference : https://stackoverflow.com/questions/17839973/constructing-pandas-dataframe-from-values-in-variables-gives-valueerror-if-usi
+
+### Writing a Decorator in Python
+Decorator allows us to augment an existing function with extra code, without requiring us to change the existing function's code.
+
+**4 things we need to understand to write a decorator**
+- How to create a function
+- How to pass a function as an argument to another function
+- How to return a function from a function
+- How to process any number and type of function arguments
+
+
+
+
+
+
+
+
+
+
+
+
