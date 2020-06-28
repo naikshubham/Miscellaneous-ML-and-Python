@@ -154,17 +154,134 @@ print(len(combination_list))
 - *Bayes rule* : A statistical method of using new evidence to iteratively update our beliefs about some outcome.
 - Intutively this makes sense as when using informed search we want to learn from evidence to make our hyperparameter better.
 
+<img src="data/b1.jpg" width="350" title="Bayes rule">
+<img src="data/b2.jpg" width="350" title="Bayes rule">
+
 #### Bayes in Medicine
 - A medical example to illustrate the Bayesian process. 
 - Let's day 5% of the people in the general population have a certain disease. THis is our P(D), probability of disease. 
 - 10% of people are genetically predisposed to this condition. i.e, because of their genetics they are more likely to get this condition. This is our P(Pre), probability of pre existing condition.
 - 20% of the people with the disease are predisposed. P(Pre|D) , probability of predisposition given that they have the disease.
-- So what is the probability that any given person has the disease?. If we know nothing about a person, then the probability of them having the disease is just the prior. However, what if we add some new evidence that this person is predisposed? We can update our beliefs by subbing into Bayes formula.
+- So what is the probability that any given person has the disease?. If we know nothing about a person, then the probability of them having the disease is just the prior. -> `P(D) = 0.05`. This is simply our prior as we have no evidence.
+- However, what if we add some new evidence that this person is predisposed? We can update our beliefs by subbing into Bayes formula.
 
 #### Bayes in Hyperparameter Tuning
 - We can apply this logic to hyperparameter tuning using following process:
 
 
+1. Pick a hyperparameter combination
+2. Build a model
+3. Get new evidence (the score of the model)
+4. Update our beliefs and choose better hyperparameters next round and continue until we are happy with the result.
+
+
+- Bayesian hyperparameter tuning is very new but quite popular for large and more complex hyperparameter tuning tasks.
+
+#### Bayesian Hyperparameter Tuning with Hyperopt
+- A useful package for bayesian hyperparameter tuning is **Hyperopt**.
+- To use this package, we first need to:
+
+
+1. Set the Domain: which is our Grid, with a bit of twist.
+2. Set the optimization algorithm (use default TPE)
+3. Finally, we need to set the objective function to minimize : we will use (1 - Accuracy), because this package tries to minimize not maximize something.
+
+#### Hyperopt : Set the Domain (Grid)
+- There are many options for how to lay out the grid in Bayesian optimization:
+
+
+1. Simple numbers
+2. Choose from a list
+3. Distribution of values
+
+
+- Hyperopt does not use point values on the grid but instead each point represents probabilities for each hyperparameter value. To keep it simple, we will use uniform distribution.
+
+#### The Domain
+- Set up the grid : code demonstrates using a simple uniform distribution between min and max values supplied.
+
+```python
+space = {'max_depth' : hp.quniform('max_depth', 2, 10, 2),
+        'min_samples_leaf': hp.quniform('min_samples_leaf', 2, 8, 2),
+        'learning_rate' : hp.quniform('learning_rate', 0.01, 1, 55)
+        }
+```
+
+- quniform means uniform but quantized(or binned) by the specified third number.
+
+#### The objective function
+- We need to define an objective function to run an algorithm: It needs to take in the parameters to test and use those to create an estimator(for us a GBM).
+- The estimator is cross-validated to find the best average score and returns the average loss over the folds.
+- We need to make our loss as (1 - best_score) since hyperopt will work to minimize what we return- we don't want to minimize accuracy.
+- `write_results` : write out the results at each iteration for analysis later.
+
+```python
+def objective(params):
+    params = {'max_depth' : int(params['max_depth']),
+             'min_samples_leaf' : int(params['min_samples_leaf']),
+             'learning_rate' : params['learning_rate']
+             }
+    gbm_clf = GradientBoostingClassifier(n_estimators=500, **params)
+    best_score = cross_val_score(gbm_clf, X_train, y_train, scoring = 'accuracy',
+                cv = 10, n_jobs = 4).mean()
+    loss = 1 - best_score
+    write_results(best_score, params, iteration)
+    return loss
+```
+
+#### Run the algorithm
+
+```python
+best_result = fmin(fn=objective,
+                space=space,
+                max_evals=500,
+                rstate=np.random.RandomState(42),
+                algo=tpe.suggest)
+```
+
+### Informed search : Genetic Algorithms
+
+#### Genetics in Machine Learning
+1. Create some models (that have hyperparameter settings)
+2. We can pick the best(by our scoring function)
+3. We can create new models that are similar to the best ones.
+4. We add in some randomness so we don't reach a local optimum
+5. Repeat this until we are happy
+
+#### Why does this work well?
+- This is an informed search that has a number of advantages.
+- It allows us to learn from previous iterations just like bayesian hyperparameter tuning.
+- It has the additional advantage of some randomness. This randomness is important bcz it means we won't just be working on finding similar models and going down a singular path.
+- We have a chance to move to a completely different area of the hyperparameter search space which may be better.
+- Finally, it takes care of many tedious aspects of ML like algorithm and hyperparameter choice.
+
+#### TPOT
+- A useful library for genetic hyperparameter tuning is TPOT: *It aims to be our DataScience Assistant, automatically optimizing pipelines of models using genetic programming* 
+- **Pipelines** not only include the model(or multiple models) but also work on features and other aspects of the process. Plus it returns the python code of the pipeline for us!
+
+#### TPOT components
+- The key arguments to a TPOT classifier are :
+
+
+1. `generations` : The number of cycles we undertake of creating offspring models, mutating and crossing over, picking the best and contiuning.
+2. `population_size` : In each iteration, the number of models we keep.
+3. `offspring_size` : Number of models to produce in each iteration
+4. `mutation_rate` : We apply randomness to a proportion of the pipelines. This hyperparameter sets that proportion (between 0 and 1)
+5. `crossover_rate` : In each iteration we crossover or breed together some of our models to find similar ones. This sets the proportion of pipelines that we do this to.
+6. `scoring` : The function to determine the best models. the objective function to determine the strongest models or offspring for e.g accuracy.
+7. `cv` : the cross validation strategy to use.
+
+```python
+from tpot import TPOTClassifier
+
+tpot = TPOTClassifier(generations=3, population_size=5, verbosity=2, offspring_size=10, scoring='accuracy', cv=5)
+
+tpot.fit(X_train, y_train)
+print(tpot.score(X_test, y_test)
+```
+
+- We keep default values for `mutation_rate` and `crossover_rate` as they are best left to the default without deeper knowledge on genetic programming.
+- Notice, how we are not even selecting algorithms or hyperparameters. **TPOT does it all!**
 
 
 
