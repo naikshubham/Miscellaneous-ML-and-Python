@@ -150,12 +150,19 @@ print(len(combination_list))
 - We can take this and undertake a more refined grid search or even another random search around these values to improve the model.
 - This simple bivariate graphing was insightful, but using advanced visualization techniques could prove useful.
 
+### Informed Methods : Bayesian Statistics
+- *Bayes rule* : A statistical method of using new evidence to iteratively update our beliefs about some outcome.
+- Intutively this makes sense as when using informed search we want to learn from evidence to make our hyperparameter better.
 
+#### Bayes in Medicine
+- A medical example to illustrate the Bayesian process. 
+- Let's day 5% of the people in the general population have a certain disease. THis is our P(D), probability of disease. 
+- 10% of people are genetically predisposed to this condition. i.e, because of their genetics they are more likely to get this condition. This is our P(Pre), probability of pre existing condition.
+- 20% of the people with the disease are predisposed. P(Pre|D) , probability of predisposition given that they have the disease.
+- So what is the probability that any given person has the disease?. If we know nothing about a person, then the probability of them having the disease is just the prior. However, what if we add some new evidence that this person is predisposed? We can update our beliefs by subbing into Bayes formula.
 
-
-
-
-
+#### Bayes in Hyperparameter Tuning
+- We can apply this logic to hyperparameter tuning using following process:
 
 
 
