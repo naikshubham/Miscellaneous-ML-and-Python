@@ -89,11 +89,16 @@ Decorator allows us to augment an existing function with extra code, without req
 - If dataset itself is changing, i.e it has different distributions on day 13 or day 14. Such data is called non-stationary data.
 
 
+### How to choose data size
+- Suppose we have large amount of data, how do we choose how much data to use for modelling.
+- Plot a simple graph of size of data on X-axis Vs Accuray on Y-axis, if the accuracy isn't increasing beyond certain data size, that is the cut-off for training data for modelling.
+
+
 ### Productionizing ML models
 - To acheive low latency in production we can convert the logistic regression weights into a hash table or dictionaries. And simply read the weights from there and apply sigmoid. **sigmoid(Wi, Xi) = yi**.
 - In case, of Decision Trees or Random forest, we can store the if else statements and execute them in C/C++/Python/Java.
 
-### hyperparameter tuninh
+### hyperparameter tuning
 
 #### Informed search : Coarse to Fine
 
@@ -101,7 +106,7 @@ Decorator allows us to augment an existing function with extra code, without req
 - Grid search and Random search are instances of uninformed search. When performing uninformed search, each iteration of hyperparameter tuning (each model) does not learn from the previous iterations. This allows us to parallelize our work. However doing so much work before being able to learn and iterate seems a bit inefficient.
 - We have been creating all the models at once and collating their scores before deciding the best at the end. An alternate approach would be to build models sequentially, learning from each iteration.
 
-<img src="data/hyperparameter.jpg" width="350" title="Informed search">
+<img src="data/hyperparameter.JPG" width="350" title="Informed search">
 
 - This is what undertaking hyperparameter searching in an informed way allows us to do.
 
@@ -135,13 +140,13 @@ print(len(combination_list))
 - Rather then running all these combinations, we can do a random search on just 500 combinations.
 - Let's first visualize just the accuracy column as a density plot.
 
-<img src="data/accuray.jpg" width="350" title="Accuracy curve">
+<img src="data/accuray.JPG" width="350" title="Accuracy curve">
 
 - There are certainly some bad models in there. Good thing we didn't do a huge grid search and waste our time on those.
 - But there are some good models in there, what hyperparameters did they use?
 - Snapshot of top models of the results dataframe, although they don't provide some good overview.
 
-<img src="data/results.jpg" width="350" title="Accuracy curve">
+<img src="data/results.JPG" width="350" title="Accuracy curve">
 
 - Instead, let's visualize each hyperparameter against the accuracy scores to see if we can see any trends.Visualizing scatter plots helps.
 
@@ -154,8 +159,8 @@ print(len(combination_list))
 - *Bayes rule* : A statistical method of using new evidence to iteratively update our beliefs about some outcome.
 - Intutively this makes sense as when using informed search we want to learn from evidence to make our hyperparameter better.
 
-<img src="data/b1.jpg" width="350" title="Bayes rule">
-<img src="data/b2.jpg" width="350" title="Bayes rule">
+<img src="data/b1.JPG" width="350" title="Bayes rule">
+<img src="data/b2.JPG" width="350" title="Bayes rule">
 
 #### Bayes in Medicine
 - A medical example to illustrate the Bayesian process. 
